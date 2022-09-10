@@ -16,6 +16,51 @@ extern "C" {
  */
 #define PIXY_FALSE 0
 
+/*! @brief Window hints.
+ *
+ *  Window hints.
+ */
+enum {
+    /*! The OpenGL context major version.
+     */
+    PIXY_CONTEXT_VERSION_MAJOR,
+    /*! The OpenGL context minor version.
+     */
+    PIXY_CONTEXT_VERSION_MINOR,
+    /*! The OpenGL context profile.
+     */
+    PIXY_OPENGL_PROFILE,
+    /*! Forward compatible OpenGL context.
+     */
+    PIXY_CONTEXT_FORWARD_COMPAT,
+    /*! Client API.
+     */
+    PIXY_CLIENT_API,
+};
+
+/*! @brief Window hint values.
+ *
+ *  Window hint values.
+ */
+enum {
+    /*! PIXY_OPENGL_PROFILE
+     */
+    /*! OpenGL Core Profile.
+     */
+    PIXY_OPENGL_CORE_PROFILE,
+    /*! OpenGL Compatiblity Profile.
+     */
+    PIXY_OPENGL_COMPATIBLITY_PROFILE,
+    /*! PIXY_CLIENT_API
+     */
+    /*! No client API.
+     */
+    PIXY_NO_API,
+    /*! OpenGL Client API.
+     */
+    PIXY_OPENGL_API,
+};
+
 /*! @brief Window configurations.
  *
  *  Window configurations.
@@ -63,51 +108,6 @@ typedef void (* PixyWindowSizeCallback)(PixyWindow* win, int width, int height);
  *  @return `PIXY_TRUE` if successful. or `PIXY_FALSE` if an error has occured.
  */
 PIXYAPI int pixyInit();
-
-/*! @brief Window hints.
- *
- *  Window hints.
- */
-enum {
-    /*! The OpenGL context major version.
-     */
-    PIXY_CONTEXT_VERSION_MAJOR,
-    /*! The OpenGL context minor version.
-     */
-    PIXY_CONTEXT_VERSION_MINOR,
-    /*! The OpenGL context profile.
-     */
-    PIXY_OPENGL_PROFILE,
-    /*! Forward compatible OpenGL context.
-     */
-    PIXY_CONTEXT_FORWARD_COMPAT,
-    /*! Client API.
-     */
-    PIXY_CLIENT_API,
-};
-
-/*! @brief Window hint values.
- *
- *  Window hint values.
- */
-enum {
-    /*! PIXY_OPENGL_PROFILE
-     */
-    /*! OpenGL Core Profile.
-     */
-    PIXY_OPENGL_CORE_PROFILE,
-    /*! OpenGL Compatiblity Profile.
-     */
-    PIXY_OPENGL_COMPATIBLITY_PROFILE,
-    /*! PIXY_CLIENT_API
-     */
-    /*! No client API.
-     */
-    PIXY_NO_API,
-    /*! OpenGL Client API.
-     */
-    PIXY_OPENGL_API,
-};
 
 /*! @brief Set a window hint value.
  *
