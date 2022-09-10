@@ -37,7 +37,18 @@ struct PixyWindow {
     int Closed : 1;
 };
 
+static int windowHints[] = {
+    [PIXY_CONTEXT_VERSION_MAJOR]        = 4,
+    [PIXY_CONTEXT_VERSION_MINOR]        = 6,
+    [PIXY_OPENGL_PROFILE]               = PIXY_OPENGL_CORE_PROFILE,
+    [PIXY_CONTEXT_FORWARD_COMPAT]       = PIXY_FALSE,
+};
+
 static LRESULT CALLBACK wndproc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam);
+
+PIXYAPI void pixyWindowHint(int hint, int value) {
+    windowHints[hint] = value;
+}
 
 PIXYAPI PixyWindow* pixyNewWindow(PixyWindowConfig cfg) {
     PixyWindow* win = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*win));
@@ -197,10 +208,20 @@ static LRESULT CALLBACK wndproc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lpara
             0,
         };
 
-        static const int ctxAttribs[] = {
-            WGL_CONTEXT_MAJOR_VERSION_ARB,  4,
-            WGL_CONTEXT_MINOR_VERSION_ARB,  6,
-            WGL_CONTEXT_PROFILE_MASK_ARB,   WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+        int profileMask = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+        if (windowHints[PIXY_OPENGL_PROFILE] == PIXY_OPENGL_CORE_PROFILE) {
+            profileMask = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
+        }
+
+        int contextFlags = 0;
+        if (windowHints[PIXY_CONTEXT_FORWARD_COMPAT] == PIXY_TRUE) {
+            contextFlags |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+        }
+
+        const int ctxAttribs[] = {
+            WGL_CONTEXT_MAJOR_VERSION_ARB,  windowHints[PIXY_CONTEXT_VERSION_MAJOR],
+            WGL_CONTEXT_MINOR_VERSION_ARB,  windowHints[PIXY_CONTEXT_VERSION_MINOR],
+            WGL_CONTEXT_PROFILE_MASK_ARB,   profileMask,
             WGL_CONTEXT_FLAGS_ARB,          WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
             0,
         };

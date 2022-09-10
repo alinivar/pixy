@@ -64,6 +64,45 @@ typedef void (* PixyWindowSizeCallback)(PixyWindow* win, int width, int height);
  */
 PIXYAPI int pixyInit();
 
+/*! @brief Window hints.
+ *
+ *  Window hints.
+ */
+enum {
+    /*! The OpenGL context major version.
+     */
+    PIXY_CONTEXT_VERSION_MAJOR,
+    /*! The OpenGL context minor version.
+     */
+    PIXY_CONTEXT_VERSION_MINOR,
+    /*! The OpenGL context profile.
+     */
+    PIXY_OPENGL_PROFILE,
+    /*! Forward compatible OpenGL context.
+     */
+    PIXY_CONTEXT_FORWARD_COMPAT,
+};
+
+/*! @brief Window hint values.
+ *
+ *  Window hint values.
+ */
+enum {
+    /*! PIXY_OPENGL_PROFILE
+     */
+    PIXY_OPENGL_CORE_PROFILE,
+    PIXY_OPENGL_COMPATIBLITY_PROFILE,
+};
+
+/*! @brief Set a window hint value.
+ *
+ *  This function sets a window hint value.
+ *  
+ *  @param[in] hint The window hint to set.
+ *  @param[in] value The new window hint value.
+ */
+PIXYAPI void pixyWindowHint(int hint, int value);
+
 /*! @brief Creates a new window and its associated context.
  *
  *  This function creates a new window and its associated OpenGL context.
