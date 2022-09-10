@@ -81,6 +81,9 @@ enum {
     /*! Forward compatible OpenGL context.
      */
     PIXY_CONTEXT_FORWARD_COMPAT,
+    /*! Client API.
+     */
+    PIXY_CLIENT_API,
 };
 
 /*! @brief Window hint values.
@@ -90,8 +93,20 @@ enum {
 enum {
     /*! PIXY_OPENGL_PROFILE
      */
+    /*! OpenGL Core Profile.
+     */
     PIXY_OPENGL_CORE_PROFILE,
+    /*! OpenGL Compatiblity Profile.
+     */
     PIXY_OPENGL_COMPATIBLITY_PROFILE,
+    /*! PIXY_CLIENT_API
+     */
+    /*! No client API.
+     */
+    PIXY_NO_API,
+    /*! OpenGL Client API.
+     */
+    PIXY_OPENGL_API,
 };
 
 /*! @brief Set a window hint value.

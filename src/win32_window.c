@@ -42,6 +42,7 @@ static int windowHints[] = {
     [PIXY_CONTEXT_VERSION_MINOR]        = 6,
     [PIXY_OPENGL_PROFILE]               = PIXY_OPENGL_CORE_PROFILE,
     [PIXY_CONTEXT_FORWARD_COMPAT]       = PIXY_FALSE,
+    [PIXY_CLIENT_API]                   = PIXY_OPENGL_API,
 };
 
 static LRESULT CALLBACK wndproc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam);
@@ -80,17 +81,61 @@ PIXYAPI PixyWindow* pixyNewWindow(PixyWindowConfig cfg) {
             return NULL;
         }
 
-        if (NULL == CreateWindowExA(0, wndcls.lpszClassName, cfg.Title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, cfg.Width, cfg.Height, NULL, NULL, hinstance, win)) {
+        const HWND hwnd = CreateWindowExA(0, wndcls.lpszClassName, cfg.Title, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, cfg.Width, cfg.Height, NULL, NULL, hinstance, win);
+        if (hwnd == NULL) {
             HeapFree(GetProcessHeap(), 0, win);
             return NULL;
         }
 
+        win->Hwnd = hwnd;
+        win->Hdc = GetDC(hwnd);
+
+        win->Closed = PIXY_FALSE;
+
+    }
+
+    /*! Context creation.
+     */
+    if (windowHints[PIXY_CLIENT_API] == PIXY_OPENGL_API)
+    {
+        static const int pixAttribs[] = {
+            WGL_DOUBLE_BUFFER_ARB,  GL_TRUE,
+            WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+            WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+            WGL_PIXEL_TYPE_ARB,     WGL_TYPE_RGBA_ARB,
+            WGL_COLOR_BITS_ARB,     32,
+            WGL_DEPTH_BITS_ARB,     24,
+            WGL_STENCIL_BITS_ARB,   8,
+            0,
+        };
+
+        int profileMask = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+        if (windowHints[PIXY_OPENGL_PROFILE] == PIXY_OPENGL_CORE_PROFILE) {
+            profileMask = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
+        }
+
+        int contextFlags = 0;
+        if (windowHints[PIXY_CONTEXT_FORWARD_COMPAT] == PIXY_TRUE) {
+            contextFlags |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
+        }
+
+        const int ctxAttribs[] = {
+            WGL_CONTEXT_MAJOR_VERSION_ARB,  windowHints[PIXY_CONTEXT_VERSION_MAJOR],
+            WGL_CONTEXT_MINOR_VERSION_ARB,  windowHints[PIXY_CONTEXT_VERSION_MINOR],
+            WGL_CONTEXT_PROFILE_MASK_ARB,   profileMask,
+            WGL_CONTEXT_FLAGS_ARB,          WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+            0,
+        };
+
+        win->Hglrc = _pixyNewContextWGL(win->Hdc, pixAttribs, ctxAttribs);
+    }
+
+    /* Process window options */
+    {
         const HDC prevHDC = wglGetCurrentDC();
         const HGLRC prevHGLRC = wglGetCurrentContext();
 
         wglMakeCurrent(win->Hdc, win->Hglrc);
-
-        /* Process window options */
 
         /* cfg.VSync */
         if (cfg.VSync) {
@@ -165,6 +210,7 @@ PIXYAPI void pixyPollEvents() {
 
 PIXYAPI void pixySwapBuffers(PixyWindow* win) {
     if (!win) return;
+    if (!win->Hglrc) return;
 
     SwapBuffers(win->Hdc);
 }
@@ -179,6 +225,8 @@ PIXYAPI void pixyDeleteWindow(PixyWindow* win) {
     ReleaseDC(win->Hwnd, win->Hdc);
 
     DestroyWindow(win->Hwnd);
+
+    HeapFree(GetProcessHeap(), 0, win);
 }
 
 static LRESULT CALLBACK wndproc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lparam) {
@@ -190,42 +238,6 @@ static LRESULT CALLBACK wndproc(HWND Hwnd, UINT Msg, WPARAM Wparam, LPARAM Lpara
         const CREATESTRUCT* cs = (const CREATESTRUCT*)Lparam;
 
         win = (PixyWindow*)cs->lpCreateParams;
-
-        win->Hwnd = Hwnd;
-        win->Hdc = GetDC(Hwnd);
-
-        static const int pixAttribs[] = {
-            WGL_DOUBLE_BUFFER_ARB,  GL_TRUE,
-            WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-            WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-            WGL_PIXEL_TYPE_ARB,     WGL_TYPE_RGBA_ARB,
-            WGL_COLOR_BITS_ARB,     32,
-            WGL_DEPTH_BITS_ARB,     24,
-            WGL_STENCIL_BITS_ARB,   8,
-            0,
-        };
-
-        int profileMask = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
-        if (windowHints[PIXY_OPENGL_PROFILE] == PIXY_OPENGL_CORE_PROFILE) {
-            profileMask = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
-        }
-
-        int contextFlags = 0;
-        if (windowHints[PIXY_CONTEXT_FORWARD_COMPAT] == PIXY_TRUE) {
-            contextFlags |= WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB;
-        }
-
-        const int ctxAttribs[] = {
-            WGL_CONTEXT_MAJOR_VERSION_ARB,  windowHints[PIXY_CONTEXT_VERSION_MAJOR],
-            WGL_CONTEXT_MINOR_VERSION_ARB,  windowHints[PIXY_CONTEXT_VERSION_MINOR],
-            WGL_CONTEXT_PROFILE_MASK_ARB,   profileMask,
-            WGL_CONTEXT_FLAGS_ARB,          WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-            0,
-        };
-
-        win->Hglrc = _pixyNewContextWGL(win->Hdc, pixAttribs, ctxAttribs);
-
-        win->Closed = PIXY_FALSE;
 
         SetWindowLongPtrA(Hwnd, GWLP_USERDATA, (LONG_PTR)win);
 
