@@ -100,12 +100,9 @@ PIXYAPI PixyWindow* pixyNewWindow(PixyWindowConfig cfg) {
             _pixySwapIntervalWGL(PIXY_FALSE);
         }
 
-        /* cfg.Visible */
-        if (cfg.Visible) {
+        /* cfg.Hidden */
+        if (!cfg.Hidden) {
             ShowWindow(win->Hwnd, SW_SHOW);
-        }
-        else {
-            ShowWindow(win->Hwnd, SW_HIDE);
         }
 
         wglMakeCurrent(prevHDC, prevHGLRC);

@@ -35,7 +35,7 @@ typedef struct PixyWindowConfig {
     int         VSync;
     /*! If this is true the window is shown upon creation, otherwise it is hidden.
      */
-    int         Visible;
+    int         Hidden;
 } PixyWindowConfig;
 
 /*! @brief Opaque window object.
