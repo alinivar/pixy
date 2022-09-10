@@ -111,6 +111,10 @@ PIXYAPI void pixySetUser(PixyWindow* win, void* userData) {
     win->UserData = userData;
 }
 
+PIXYAPI void pixySetClosed(PixyWindow* win, int value) {
+    win->Closed = value;
+}
+
 PIXYAPI void* pixyGetUser(PixyWindow* win) {
     return win->UserData;
 }

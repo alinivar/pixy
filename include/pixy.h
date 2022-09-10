@@ -92,6 +92,15 @@ PIXYAPI void pixySwapInterval(int interval);
  */
 PIXYAPI void pixySetUser(PixyWindow* win, void* userData);
 
+/*! @brief Sets the closed flag of the specified window.
+ *
+ *  This function sets the closed flag of the specified window.
+ * 
+ *  @param[in] win The window whose closed flag to be set.
+ *  @param[in] value The new value of the closed flag.
+ */
+PIXYAPI void pixySetClosed(PixyWindow* win, int value);
+
 /*! @brief Get the specified window's user data pointer.
  *
  *  This function gets the specified window's user data pointer.
